@@ -1,40 +1,15 @@
-DST Sarf – مشروع Android مبدئي
+DST Sarf – تطبيق Android
 
-ما الذي يفعله؟
-- يفتح الموقع الأصلي المنشور على Vercel داخل تطبيق Android.
-- لا ينشئ قاعدة بيانات جديدة؛ الموقع يظل مصدر البيانات والحسابات والصلاحيات.
-- يدعم JavaScript وDOM Storage وملفات الرفع واختيار الملفات.
-- أيقونة التطبيق مبنية من شعار DST (DIGITAL SMART TREE) بخلفية شفافة.
+- اسم التطبيق: DST Sarf
+- Package ID: com.digitalsmarttree.fertilizercontrol
+- يفتح الموقع الأصلي داخل WebView: https://fert-control-tested-2026.vercel.app/
+- يدعم JavaScript وDOM Storage والجلسات ورفع الملفات وتنزيل الملفات.
+- يستخدم شعار DST الموجود في أيقونة التطبيق بخلفية بيضاء.
 
-عنوان الموقع:
-https://fert-control-tested-2026.vercel.app/
+البناء:
+- Java 17
+- Android Gradle Plugin 8.7.3
+- Android SDK 35
+- GitHub Actions يبني نسخة Debug APK تلقائيًا عند كل تحديث على main.
 
-اسم التطبيق:
-DST Sarf
-
-معرّف التطبيق:
-com.digitalsmarttree.fertilizercontrol
-
-طريقة بناء APK:
-1) افتح المجلد في Android Studio.
-2) استخدم JDK 17 أو النسخة التي يوصي بها Android Studio.
-3) اسمح بمزامنة Gradle وتنزيل Android Gradle Plugin وSDK 35.
-4) من Build > Build Bundle(s) / APK(s) > Build APK(s).
-5) لإصدار Google Play استخدم Build > Generate Signed Bundle / APK ثم اختر Android App Bundle (AAB).
-
-تنبيهات قبل التوزيع:
-- هذا مشروع مصدر Android أولي (WebView wrapper)، وليس APK موقعًا أو جاهزًا للنشر بعد.
-- يجب اختبار تسجيل الدخول، رفع الصور وPDF، تنزيل التقارير، التنقل، لوحة المفاتيح العربية، واستعادة الجلسة على أجهزة فعلية.
-- يجب مراجعة سياسة Google Play الخاصة بالتطبيقات التي تعرض محتوى ويب، وتوفير قيمة استخدام مناسبة وتجربة تطبيق موثوقة.
-- يلزم حساب Google Play Console للجهة المالكة، والتحقق من بيانات المؤسسة، وإكمال متطلبات سياسة الخصوصية وتصنيف المحتوى وبيانات الأمان.
-- لا تضع كلمات مرور أو مفاتيح API داخل التطبيق.
-- يجب الحصول على موافقة الشركة/الجهة على استخدام الشعار والاسم قبل النشر الرسمي.
-
-البناء التلقائي عبر GitHub Actions:
-1) أنشئ مستودعًا جديدًا على GitHub وارفع محتويات هذا المجلد إليه، مع الحفاظ على مجلد .github.
-2) افتح تبويب Actions في المستودع وفعّل GitHub Actions إذا طُلب ذلك.
-3) شغّل workflow باسم Build Android app من زر Run workflow، أو ادفع commit إلى main أو master.
-4) بعد نجاح التشغيل افتح صفحة التشغيل ثم قسم Artifacts لتنزيل ملف APK وملف AAB.
-5) ملف APK الناتج من assembleDebug مناسب للتجربة والتثبيت. ملف AAB الناتج بدون توقيع ما زال يحتاج إعداد توقيع إصدار قبل رفعه إلى Google Play.
-
-ملاحظة: لم تتم إضافة أي مفاتيح توقيع أو كلمات مرور إلى المشروع. لا ترفع keystore أو كلمات مروره إلى GitHub أو داخل ملفات المشروع. عند تجهيز النشر الرسمي، تُضاف بيانات التوقيع بأمان إلى GitHub Actions Secrets ويُحدّث إعداد التوقيع قبل إصدار AAB نهائي.
+ملاحظة: يجب اختبار تسجيل الدخول ورفع الصور وPDF والتنزيلات على جهاز Android فعلي قبل التوزيع.
