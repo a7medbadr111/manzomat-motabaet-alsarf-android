@@ -27,38 +27,54 @@ public class MainActivity extends Activity {
     // The Vercel website source and deployment are not modified.
     private static final String BRANDING_SCRIPT =
         "(function() {" +
-        " if (window.__dstSarfBrandingInstalled) return;" +
-        " window.__dstSarfBrandingInstalled = true;" +
         " var oldLabel = 'مركز متابعة الأسمدة';" +
-        " function replaceBranding() {" +
+        " function makeBrand() {" +
         "   var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);" +
         "   var nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);" +
         "   nodes.forEach(function(node) {" +
-        "     if ((node.nodeValue || '').indexOf(oldLabel) === -1) return;" +
-        "     var host = node.parentElement; if (!host) return;" +
+        "     if ((node.nodeValue || '').indexOf(oldLabel) === -1 || !node.parentElement) return;" +
+        "     var host = node.parentElement;" +
         "     var wrap = document.createElement('span');" +
         "     wrap.setAttribute('data-dst-sarf-brand', '1');" +
-        "     wrap.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;gap:8px;direction:ltr;vertical-align:middle;white-space:nowrap;background:#fff;';" +
-        "     var img = document.createElement('img');" +
-        "     img.src = '__DST_LOGO_DATA__';" +
-        "     img.alt = 'DIGITAL SMART TREE';" +
-        "     img.style.cssText = 'display:block;width:108px;height:48px;object-fit:contain;background:#fff;';" +
+        "     wrap.style.cssText = 'display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;direction:ltr!important;white-space:nowrap!important;background:#fff!important;';" +
+        "     var img = document.createElement('img'); img.src = '__DST_LOGO_DATA__'; img.alt = 'DIGITAL SMART TREE';" +
+        "     img.style.cssText = 'display:block!important;width:118px!important;height:62px!important;object-fit:contain!important;background:#fff!important;';" +
         "     var word = document.createElement('span'); word.textContent = 'صرف';" +
-        "     word.style.cssText = 'font-weight:700;font-size:1.15em;color:#238fa5;line-height:1;';" +
+        "     word.style.cssText = 'font-weight:700!important;font-size:24px!important;color:#238fa5!important;line-height:1!important;';" +
         "     wrap.appendChild(img); wrap.appendChild(word);" +
         "     var before = node.nodeValue.slice(0, node.nodeValue.indexOf(oldLabel));" +
         "     var after = node.nodeValue.slice(node.nodeValue.indexOf(oldLabel) + oldLabel.length);" +
         "     var frag = document.createDocumentFragment();" +
-        "     if (before) frag.appendChild(document.createTextNode(before));" +
+        "     if (before.trim()) frag.appendChild(document.createTextNode(before));" +
         "     frag.appendChild(wrap);" +
-        "     if (after) frag.appendChild(document.createTextNode(after));" +
+        "     if (after.trim()) frag.appendChild(document.createTextNode(after));" +
         "     host.replaceChild(frag, node);" +
         "   });" +
+        "   document.querySelectorAll('[data-dst-sarf-brand]').forEach(function(brand) {" +
+        "     var row = brand.parentElement;" +
+        "     for (var level=0; level<4 && row; level++, row=row.parentElement) {" +
+        "       if (!row || !row.children) continue;" +
+        "       var iconSiblings = Array.from(row.children).filter(function(el) {" +
+        "         return !el.contains(brand) && (el.querySelector('svg, img, [role=img]') || el.matches('svg,img,[role=img]'));" +
+        "       });" +
+        "       if (iconSiblings.length) {" +
+        "         iconSiblings.forEach(function(el) { el.remove(); });" +
+        "         row.style.setProperty('display','flex','important');" +
+        "         row.style.setProperty('align-items','center','important');" +
+        "         row.style.setProperty('justify-content','center','important');" +
+        "         row.style.setProperty('gap','10px','important');" +
+        "         row.style.setProperty('background','#fff','important');" +
+        "         break;" +
+        "       }" +
+        "     }" +
+        "   });" +
         " }" +
-        " replaceBranding();" +
-        " var observer = new MutationObserver(function() { replaceBranding(); });" +
-        " observer.observe(document.documentElement, {childList:true,subtree:true,characterData:true});" +
-        " setTimeout(replaceBranding, 500); setTimeout(replaceBranding, 1500);" +
+        " makeBrand();" +
+        " if (!window.__dstSarfObserver) {" +
+        "   window.__dstSarfObserver = new MutationObserver(function() { makeBrand(); });" +
+        "   window.__dstSarfObserver.observe(document.documentElement,{childList:true,subtree:true,characterData:true});" +
+        " }" +
+        " setTimeout(makeBrand,300); setTimeout(makeBrand,900); setTimeout(makeBrand,1800);" +
         "})();";
 
     private String getBrandingScript() {
