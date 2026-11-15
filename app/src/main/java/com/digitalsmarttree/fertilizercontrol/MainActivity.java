@@ -98,7 +98,7 @@ public class MainActivity extends Activity {
                 request.setDescription("جاري تنزيل الملف");
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                 request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
-                    DownloadManager.Request.getFileNameFromContentDisposition(contentDisposition, url, mimeType));
+                    android.webkit.URLUtil.guessFileName(url, contentDisposition, mimeType));
                 ((DownloadManager) getSystemService(DOWNLOAD_SERVICE)).enqueue(request);
                 Toast.makeText(this, "بدأ تنزيل الملف", Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
