@@ -5,10 +5,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -22,26 +18,48 @@ public class MainActivity extends Activity {
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
 
+    // Cosmetic changes are applied only inside this Android WebView.
+    // The Vercel website source and deployment are not modified.
+    private static final String BRANDING_SCRIPT =
+        "(function() {" +
+        " if (window.__dstSarfBrandingInstalled) return;" +
+        " window.__dstSarfBrandingInstalled = true;" +
+        " var oldLabel = 'مركز متابعة الأسمدة';" +
+        " function replaceBranding() {" +
+        "   var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);" +
+        "   var nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);" +
+        "   nodes.forEach(function(node) {" +
+        "     if ((node.nodeValue || '').indexOf(oldLabel) === -1) return;" +
+        "     var host = node.parentElement; if (!host) return;" +
+        "     var wrap = document.createElement('span');" +
+        "     wrap.setAttribute('data-dst-sarf-brand', '1');" +
+        "     wrap.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;gap:8px;direction:ltr;vertical-align:middle;white-space:nowrap;background:#fff;';" +
+        "     var img = document.createElement('img');" +
+        "     img.src = 'file:///android_res/drawable/dst_logo';" +
+        "     img.alt = 'DIGITAL SMART TREE';" +
+        "     img.style.cssText = 'display:block;width:108px;height:48px;object-fit:contain;background:#fff;';" +
+        "     var word = document.createElement('span'); word.textContent = 'صرف';" +
+        "     word.style.cssText = 'font-weight:700;font-size:1.15em;color:#238fa5;line-height:1;';" +
+        "     wrap.appendChild(img); wrap.appendChild(word);" +
+        "     var before = node.nodeValue.slice(0, node.nodeValue.indexOf(oldLabel));" +
+        "     var after = node.nodeValue.slice(node.nodeValue.indexOf(oldLabel) + oldLabel.length);" +
+        "     var frag = document.createDocumentFragment();" +
+        "     if (before) frag.appendChild(document.createTextNode(before));" +
+        "     frag.appendChild(wrap);" +
+        "     if (after) frag.appendChild(document.createTextNode(after));" +
+        "     host.replaceChild(frag, node);" +
+        "   });" +
+        " }" +
+        " replaceBranding();" +
+        " var observer = new MutationObserver(function() { replaceBranding(); });" +
+        " observer.observe(document.documentElement, {childList:true,subtree:true,characterData:true});" +
+        " setTimeout(replaceBranding, 500); setTimeout(replaceBranding, 1500);" +
+        "})();";
+
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        LinearLayout root = new LinearLayout(this);
-        root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(0xFFFFFFFF);
-
-        ImageView brand = new ImageView(this);
-        brand.setImageResource(R.drawable.dst_logo);
-        brand.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        brand.setBackgroundColor(0xFFFFFFFF);
-        brand.setPadding(12, 6, 12, 6);
-        brand.setContentDescription("DIGITAL SMART TREE");
-        root.addView(brand, new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, dp(92)));
-
         webView = new WebView(this);
-        root.addView(webView, new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
-        setContentView(root);
+        setContentView(webView);
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -53,6 +71,10 @@ public class MainActivity extends Activity {
         settings.setJavaScriptCanOpenWindowsAutomatically(true);
 
         webView.setWebViewClient(new WebViewClient() {
+            @Override public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                view.evaluateJavascript(BRANDING_SCRIPT, null);
+            }
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 return handleUrl(request.getUrl());
             }
@@ -80,11 +102,10 @@ public class MainActivity extends Activity {
         });
 
         if (savedInstanceState == null) webView.loadUrl(HOME_URL);
-        else webView.restoreState(savedInstanceState);
-    }
-
-    private int dp(int value) {
-        return (int) (value * getResources().getDisplayMetrics().density + 0.5f);
+        else {
+            webView.restoreState(savedInstanceState);
+            webView.post(() -> webView.evaluateJavascript(BRANDING_SCRIPT, null));
+        }
     }
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
