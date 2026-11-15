@@ -5,6 +5,11 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
+import android.util.Base64;
+import java.io.ByteArrayOutputStream;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -35,7 +40,7 @@ public class MainActivity extends Activity {
         "     wrap.setAttribute('data-dst-sarf-brand', '1');" +
         "     wrap.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;gap:8px;direction:ltr;vertical-align:middle;white-space:nowrap;background:#fff;';" +
         "     var img = document.createElement('img');" +
-        "     img.src = 'file:///android_res/drawable/dst_logo';" +
+        "     img.src = '__DST_LOGO_DATA__';" +
         "     img.alt = 'DIGITAL SMART TREE';" +
         "     img.style.cssText = 'display:block;width:108px;height:48px;object-fit:contain;background:#fff;';" +
         "     var word = document.createElement('span'); word.textContent = 'صرف';" +
@@ -56,6 +61,21 @@ public class MainActivity extends Activity {
         " setTimeout(replaceBranding, 500); setTimeout(replaceBranding, 1500);" +
         "})();";
 
+    private String getBrandingScript() {
+        Drawable drawable = getDrawable(R.drawable.dst_logo);
+        int width = 720, height = 380;
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(0xFFFFFFFF);
+        drawable.setBounds(0, 0, width, height);
+        drawable.draw(canvas);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, output);
+        bitmap.recycle();
+        String encoded = Base64.encodeToString(output.toByteArray(), Base64.NO_WRAP);
+        return BRANDING_SCRIPT.replace("__DST_LOGO_DATA__", "data:image/png;base64," + encoded);
+    }
+
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         webView = new WebView(this);
@@ -73,7 +93,7 @@ public class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient() {
             @Override public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                view.evaluateJavascript(BRANDING_SCRIPT, null);
+                view.evaluateJavascript(getBrandingScript(), null);
             }
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 return handleUrl(request.getUrl());
@@ -104,7 +124,7 @@ public class MainActivity extends Activity {
         if (savedInstanceState == null) webView.loadUrl(HOME_URL);
         else {
             webView.restoreState(savedInstanceState);
-            webView.post(() -> webView.evaluateJavascript(BRANDING_SCRIPT, null));
+            webView.post(() -> webView.evaluateJavascript(getBrandingScript(), null));
         }
     }
 
